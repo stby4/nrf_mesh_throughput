@@ -11,9 +11,9 @@
  <Memory3/>
  <Memory4/>
  <Project>
-  <ProjectSessionItem path="light_switch_server_nrf52840_xxAA_s140_6.1.0"/>
-  <ProjectSessionItem path="light_switch_server_nrf52840_xxAA_s140_6.1.0;light_switch_server_nrf52840_xxAA_s140_6.1.0"/>
-  <ProjectSessionItem path="light_switch_server_nrf52840_xxAA_s140_6.1.0;light_switch_server_nrf52840_xxAA_s140_6.1.0;Application"/>
+  <ProjectSessionItem path="mesh_throughput_nrf52840_xxAA"/>
+  <ProjectSessionItem path="mesh_throughput_nrf52840_xxAA;mesh_throughput_nrf52840_xxAA"/>
+  <ProjectSessionItem path="mesh_throughput_nrf52840_xxAA;mesh_throughput_nrf52840_xxAA;Application"/>
  </Project>
  <Register1/>
  <Register2/>
@@ -38,8 +38,9 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../doc/getting_started/SES.md" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="46" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="1" top="30" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="46" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="0" top="36" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="54" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="0" top="42" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1" useTextEdit="1" useBinaryEdit="0" left="0" path="light_switch_server_nrf52840_xxAA_s140_6_1_0.emProject" selected="1" top="0" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="light_switch_server_nrf52840_xxAA_s140_6.1.0" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
+ <ARMCrossStudioWindow activeProject="mesh_throughput_nrf52840_xxAA" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

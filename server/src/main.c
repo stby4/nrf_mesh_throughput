@@ -58,7 +58,7 @@
 #include "mesh_app_utils.h"
 
 /* Models */
-#include "generic_onoff_server.h"
+#include "generic_message_server.h"
 
 /* Logging and RTT */
 #include "log.h"
@@ -69,48 +69,48 @@
 #include "example_common.h"
 #include "nrf_mesh_config_examples.h"
 #include "light_switch_example_common.h"
-#include "app_onoff.h"
+#include "app_message.h"
 #include "ble_softdevice_support.h"
 
-#define ONOFF_SERVER_0_LED          (BSP_LED_0)
-#define APP_ONOFF_ELEMENT_INDEX     (0)
+#define MESSAGE_SERVER_0_LED          (BSP_LED_0)
+#define APP_MESSAGE_ELEMENT_INDEX     (0)
 
 static bool m_device_provisioned;
 
 /*************************************************************************************************/
-static void app_onoff_server_set_cb(const app_onoff_server_t * p_server, bool onoff);
-static void app_onoff_server_get_cb(const app_onoff_server_t * p_server, bool * p_present_onoff);
+static void app_message_server_set_cb(const app_message_server_t * p_server, bool message);
+static void app_message_server_get_cb(const app_message_server_t * p_server, bool * p_present_message);
 
-/* Generic OnOff server structure definition and initialization */
-APP_ONOFF_SERVER_DEF(m_onoff_server_0,
+/* Generic message server structure definition and initialization */
+APP_MESSAGE_SERVER_DEF(m_message_server_0,
                      APP_CONFIG_FORCE_SEGMENTATION,
                      APP_CONFIG_MIC_SIZE,
-                     app_onoff_server_set_cb,
-                     app_onoff_server_get_cb)
+                     app_message_server_set_cb,
+                     app_message_server_get_cb)
 
 /* Callback for updating the hardware state */
-static void app_onoff_server_set_cb(const app_onoff_server_t * p_server, bool onoff)
+static void app_message_server_set_cb(const app_message_server_t * p_server, bool message)
 {
     /* Resolve the server instance here if required, this example uses only 1 instance. */
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Setting GPIO value: %d\n", onoff)
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Setting GPIO value: %d\n", message)
 
-    hal_led_pin_set(ONOFF_SERVER_0_LED, onoff);
+    hal_led_pin_set(MESSAGE_SERVER_0_LED, message);
 }
 
 /* Callback for reading the hardware state */
-static void app_onoff_server_get_cb(const app_onoff_server_t * p_server, bool * p_present_onoff)
+static void app_message_server_get_cb(const app_message_server_t * p_server, bool * p_present_message)
 {
     /* Resolve the server instance here if required, this example uses only 1 instance. */
 
-    *p_present_onoff = hal_led_pin_get(ONOFF_SERVER_0_LED);
+    *p_present_message = hal_led_pin_get(MESSAGE_SERVER_0_LED);
 }
 
 static void app_model_init(void)
 {
-    /* Instantiate onoff server on element index APP_ONOFF_ELEMENT_INDEX */
-    ERROR_CHECK(app_onoff_init(&m_onoff_server_0, APP_ONOFF_ELEMENT_INDEX));
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "App OnOff Model Handle: %d\n", m_onoff_server_0.server.model_handle);
+    /* Instantiate message server on element index APP_MESSAGE_ELEMENT_INDEX */
+    ERROR_CHECK(app_message_init(&m_message_server_0, APP_MESSAGE_ELEMENT_INDEX));
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "App Message Model Handle: %d\n", m_message_server_0.server.model_handle);
 }
 
 /*************************************************************************************************/
@@ -142,8 +142,8 @@ static void button_event_handler(uint32_t button_number)
         case 0:
         {
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "User action \n");
-            hal_led_pin_set(ONOFF_SERVER_0_LED, !hal_led_pin_get(ONOFF_SERVER_0_LED));
-            app_onoff_status_publish(&m_onoff_server_0);
+            hal_led_pin_set(MESSAGE_SERVER_0_LED, !hal_led_pin_get(MESSAGE_SERVER_0_LED));
+            app_message_status_publish(&m_message_server_0);
             break;
         }
 
@@ -235,7 +235,7 @@ static void mesh_init(void)
 static void initialize(void)
 {
     __LOG_INIT(LOG_SRC_APP | LOG_SRC_ACCESS | LOG_SRC_BEARER, LOG_LEVEL_INFO, LOG_CALLBACK_DEFAULT);
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "----- BLE Mesh Light Switch Server Demo -----\n");
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "----- BLE Mesh Message Server Demo -----\n");
 
     ERROR_CHECK(app_timer_init());
     hal_leds_init();

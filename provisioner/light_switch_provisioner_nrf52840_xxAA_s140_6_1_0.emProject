@@ -1,6 +1,6 @@
 <!DOCTYPE CrossStudio_Project_File>
-<solution Name="light_switch_provisioner_nrf52840_xxAA_s140_6.1.0" target="8" version="2">
-  <project Name="light_switch_provisioner_nrf52840_xxAA_s140_6.1.0">
+<solution Name="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0" target="8" version="2">
+  <project Name="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0">
     <configuration
       Name="Common"
       arm_architecture="v7EM"

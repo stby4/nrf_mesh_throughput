@@ -1,6 +1,6 @@
 <!DOCTYPE CrossStudio_Project_File>
-<solution Name="light_switch_server_nrf52832_xxAA_s132_6.1.0" target="8" version="2">
-  <project Name="light_switch_server_nrf52832_xxAA_s132_6.1.0">
+<solution Name="mesh_throughput_server_nrf52832_xxAA_s132_6.1.0" target="8" version="2">
+  <project Name="mesh_throughput_server_nrf52832_xxAA_s132_6.1.0">
     <configuration
       Name="Common"
       arm_architecture="v7EM"
