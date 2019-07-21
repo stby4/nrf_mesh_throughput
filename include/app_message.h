@@ -101,9 +101,9 @@
 typedef struct
 {
     /** Present value of the message state */
-    bool present_message;
+    uint8_t* present_message;
     /** Target value of the message state, as received from the model interface. */
-    bool target_message;
+    uint8_t* target_message;
     /** Remaining time to reach `target_message`. */
     uint32_t remaining_time_ms;
     /** Time to delay the processing of received SET message. */
