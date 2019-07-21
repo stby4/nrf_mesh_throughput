@@ -78,8 +78,8 @@
 static bool m_device_provisioned;
 
 /*************************************************************************************************/
-static void app_message_server_set_cb(const app_message_server_t * p_server, bool message);
-static void app_message_server_get_cb(const app_message_server_t * p_server, bool * p_present_message);
+static void app_message_server_set_cb(const app_message_server_t * p_server, uint8_t * message);
+static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t * p_present_message);
 
 /* Generic message server structure definition and initialization */
 APP_MESSAGE_SERVER_DEF(m_message_server_0,
@@ -89,21 +89,23 @@ APP_MESSAGE_SERVER_DEF(m_message_server_0,
                      app_message_server_get_cb)
 
 /* Callback for updating the hardware state */
-static void app_message_server_set_cb(const app_message_server_t * p_server, bool message)
+static void app_message_server_set_cb(const app_message_server_t * p_server, uint8_t * message)
 {
     /* Resolve the server instance here if required, this example uses only 1 instance. */
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Setting GPIO value: %d\n", message)
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message received: %d\n", message)
 
-    hal_led_pin_set(MESSAGE_SERVER_0_LED, message);
+    //hal_led_pin_set(MESSAGE_SERVER_0_LED, message);
 }
 
 /* Callback for reading the hardware state */
-static void app_message_server_get_cb(const app_message_server_t * p_server, bool * p_present_message)
+static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t * p_present_message)
 {
     /* Resolve the server instance here if required, this example uses only 1 instance. */
-
-    *p_present_message = hal_led_pin_get(MESSAGE_SERVER_0_LED);
+    static uint8_t message[256];
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message to send: %d\n", message)
+    *p_present_message = message;
+    //*p_present_message = hal_led_pin_get(MESSAGE_SERVER_0_LED);
 }
 
 static void app_model_init(void)

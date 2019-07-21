@@ -57,7 +57,7 @@
 #include "mesh_app_utils.h"
 
 /* Models */
-#include "generic_onoff_client.h"
+#include "generic_message_client.h"
 
 /* Logging and RTT */
 #include "log.h"
@@ -75,23 +75,23 @@
 
 #define APP_UNACK_MSG_REPEAT_COUNT   (2)
 
-static generic_onoff_client_t m_clients[CLIENT_MODEL_INSTANCE_COUNT];
+static generic_message_client_t m_clients[CLIENT_MODEL_INSTANCE_COUNT];
 static bool                   m_device_provisioned;
 
 /* Forward declaration */
-static void app_gen_onoff_client_publish_interval_cb(access_model_handle_t handle, void * p_self);
-static void app_generic_onoff_client_status_cb(const generic_onoff_client_t * p_self,
+static void app_gen_message_client_publish_interval_cb(access_model_handle_t handle, void * p_self);
+static void app_generic_message_client_status_cb(const generic_message_client_t * p_self,
                                                const access_message_rx_meta_t * p_meta,
-                                               const generic_onoff_status_params_t * p_in);
-static void app_gen_onoff_client_transaction_status_cb(access_model_handle_t model_handle,
+                                               const generic_message_status_params_t * p_in);
+static void app_gen_message_client_transaction_status_cb(access_model_handle_t model_handle,
                                                        void * p_args,
                                                        access_reliable_status_t status);
 
-const generic_onoff_client_callbacks_t client_cbs =
+const generic_message_client_callbacks_t client_cbs =
 {
-    .onoff_status_cb = app_generic_onoff_client_status_cb,
-    .ack_transaction_status_cb = app_gen_onoff_client_transaction_status_cb,
-    .periodic_publish_cb = app_gen_onoff_client_publish_interval_cb
+    .message_status_cb = app_generic_message_client_status_cb,
+    .ack_transaction_status_cb = app_gen_message_client_transaction_status_cb,
+    .periodic_publish_cb = app_gen_message_client_publish_interval_cb
 };
 
 static void device_identification_start_cb(uint8_t attention_duration_s)
@@ -128,7 +128,7 @@ static void provisioning_complete_cb(void)
 }
 
 /* This callback is called periodically if model is configured for periodic publishing */
-static void app_gen_onoff_client_publish_interval_cb(access_model_handle_t handle, void * p_self)
+static void app_gen_message_client_publish_interval_cb(access_model_handle_t handle, void * p_self)
 {
      __LOG(LOG_SRC_APP, LOG_LEVEL_WARN, "Publish desired message here.\n");
 }
@@ -137,7 +137,7 @@ static void app_gen_onoff_client_publish_interval_cb(access_model_handle_t handl
 * determine suitable course of action (e.g. re-initiate previous transaction) by using this
 * callback.
 */
-static void app_gen_onoff_client_transaction_status_cb(access_model_handle_t model_handle,
+static void app_gen_message_client_transaction_status_cb(access_model_handle_t model_handle,
                                                        void * p_args,
                                                        access_reliable_status_t status)
 {
@@ -163,19 +163,19 @@ static void app_gen_onoff_client_transaction_status_cb(access_model_handle_t mod
 }
 
 /* Generic OnOff client model interface: Process the received status message in this callback */
-static void app_generic_onoff_client_status_cb(const generic_onoff_client_t * p_self,
+static void app_generic_message_client_status_cb(const generic_message_client_t * p_self,
                                                const access_message_rx_meta_t * p_meta,
-                                               const generic_onoff_status_params_t * p_in)
+                                               const generic_message_status_params_t * p_in)
 {
     if (p_in->remaining_time_ms > 0)
     {
         __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "OnOff server: 0x%04x, Present OnOff: %d, Target OnOff: %d, Remaining Time: %d ms\n",
-              p_meta->src.value, p_in->present_on_off, p_in->target_on_off, p_in->remaining_time_ms);
+              p_meta->src.value, p_in->present_message, p_in->target_message, p_in->remaining_time_ms);
     }
     else
     {
         __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "OnOff server: 0x%04x, Present OnOff: %d\n",
-              p_meta->src.value, p_in->present_on_off);
+              p_meta->src.value, p_in->present_message);
     }
 }
 
@@ -200,31 +200,34 @@ static void button_event_handler(uint32_t button_number)
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Button %u pressed\n", button_number);
 
     uint32_t status = NRF_SUCCESS;
-    generic_onoff_set_params_t set_params;
+    generic_message_set_params_t set_params;
     model_transition_t transition_params;
     static uint8_t tid = 0;
+    static uint8_t message[256];
 
     /* Button 1: On, Button 2: Off, Client[0]
      * Button 2: On, Button 3: Off, Client[1]
      */
 
+/*
     switch(button_number)
     {
         case 0:
         case 2:
-            set_params.on_off = APP_STATE_ON;
+            set_params.message = APP_STATE_ON;
             break;
 
         case 1:
         case 3:
-            set_params.on_off = APP_STATE_OFF;
+            set_params.message = APP_STATE_OFF;
             break;
     }
-
+*/
+    set_params.message = message;
     set_params.tid = tid++;
-    transition_params.delay_ms = APP_CONFIG_ONOFF_DELAY_MS;
-    transition_params.transition_time_ms = APP_CONFIG_ONOFF_TRANSITION_TIME_MS;
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Sending msg: ONOFF SET %d\n", set_params.on_off);
+    transition_params.delay_ms = APP_CONFIG_MESSAGE_DELAY_MS;
+    transition_params.transition_time_ms = APP_CONFIG_MESSAGE_TRANSITION_TIME_MS;
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Sending msg: MESSAGE SET %d\n", set_params.message);
 
     switch (button_number)
     {
@@ -233,16 +236,16 @@ static void button_event_handler(uint32_t button_number)
             /* Demonstrate acknowledged transaction, using 1st client model instance */
             /* In this examples, users will not be blocked if the model is busy */
             (void)access_model_reliable_cancel(m_clients[0].model_handle);
-            status = generic_onoff_client_set(&m_clients[0], &set_params, &transition_params);
-            hal_led_pin_set(BSP_LED_0, set_params.on_off);
+            status = generic_message_client_set(&m_clients[0], &set_params, &transition_params);
+            hal_led_pin_set(BSP_LED_0, set_params.message);
             break;
 
         case 2:
         case 3:
             /* Demonstrate un-acknowledged transaction, using 2nd client model instance */
-            status = generic_onoff_client_set_unack(&m_clients[1], &set_params,
+            status = generic_message_client_set_unack(&m_clients[1], &set_params,
                                                     &transition_params, APP_UNACK_MSG_REPEAT_COUNT);
-            hal_led_pin_set(BSP_LED_1, set_params.on_off);
+            hal_led_pin_set(BSP_LED_1, set_params.message);
             break;
     }
 
@@ -295,7 +298,7 @@ static void models_init_cb(void)
         m_clients[i].settings.force_segmented = APP_CONFIG_FORCE_SEGMENTATION;
         m_clients[i].settings.transmic_size = APP_CONFIG_MIC_SIZE;
 
-        ERROR_CHECK(generic_onoff_client_init(&m_clients[i], i + 1));
+        ERROR_CHECK(generic_message_client_init(&m_clients[i], i + 1));
     }
 }
 

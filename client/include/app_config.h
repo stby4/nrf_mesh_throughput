@@ -53,10 +53,10 @@
 #define APP_CONFIG_MIC_SIZE            (NRF_MESH_TRANSMIC_SIZE_SMALL)
 
 /** Delay value used by the OnOff client for sending OnOff Set messages. */
-#define APP_CONFIG_ONOFF_DELAY_MS           (50)
+#define APP_CONFIG_MESSAGE_DELAY_MS           (50)
 
 /** Transition time value used by the OnOff client for sending OnOff Set messages. */
-#define APP_CONFIG_ONOFF_TRANSITION_TIME_MS (100)
+#define APP_CONFIG_MESSAGE_TRANSITION_TIME_MS (100)
 
 /** @} end of APP_SPECIFIC_DEFINES */
 
