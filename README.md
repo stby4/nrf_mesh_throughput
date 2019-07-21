@@ -1,143 +1,50 @@
 # Light switch example
 
-@note This example is not supported by the nRF52810 Series.
+> This example has only been tested with the nRF52840 series.
 
-This example demonstrates the mesh ecosystem that contains devices acting in two roles: Provisioner role and Node role
-(also referred to as provisionee role). It also demonstrates how to use Mesh models by using the [Generic OnOff model](@ref GENERIC_ONOFF_MODEL)
-in an application.
-
-**Table of contents**
-- [Hardware requirements](@ref light_switch_example_hw_requirements)
-- [Setup](@ref light_switch_example_setup)
-    - [LED and button assignments](@ref light_switch_example_setup_leds_buttons)
-- [Testing the example](@ref light_switch_example_testing)
-    - [Evaluating using the static provisioner](@ref light_switch_example_testing_dk)
-    - [Evaluating using the nRF Mesh mobile app](@ref light_switch_example_testing_app)
-    - [Interacting with the boards](@ref light_switch_example_testing_interacting)
-
-The example is composed of three minor examples:
-- Light switch server: A minimalistic server that implements a
-[Generic OnOff server model](@ref GENERIC_ONOFF_MODEL), which is used to
-receive the state data and control the state of LED 1 on the board.
-- Light switch client: A minimalistic client that implements four instances of a
-[Generic OnOff client model](@ref GENERIC_ONOFF_MODEL).
-When a user presses any of the buttons, an OnOff Set message is sent out to the
-configured destination address.
-- Mesh Provisioner: A simple static provisioner implementation that sets up the demonstration network.
-This provisioner provisions all the nodes in one mesh network. Additionally, the provisioner also configures
-key bindings and publication and subscription settings of mesh model instances on these nodes
-to enable them to talk to each other.
-
-@note For provisioning purposes, you can either use the static provisioner example or use the @link_nrf_mesh_app.
-
-The Generic OnOff Client/Server is used for manipulating the on/off state. Note that when the server has
-a publish address set (as in this example), the server will publish any operation of its state change to
-its publish address. More information about the Generic OnOff model can be found in the [Generic OnOff model documentation](@ref GENERIC_ONOFF_MODEL)
-and [Generic OnOff server behavior documentation](@ref APP_ONOFF).
-
-For a more detailed overview of the example structure and an introduction to various SDK APIs,
-see the following pages:
-- @subpage md_examples_light_switch_server_README
-- @subpage md_examples_light_switch_client_README
-- @subpage md_examples_light_switch_provisioner_README
-
-The following figure gives the overall view of the mesh network that will be set up
-by the static provisioner. Numbers in parentheses indicate the addresses that are assigned
-to these nodes by the provisioner.
-
-![Mesh network demonstration](img/mesh-nw-demo_r02.svg "Mesh network demonstration")
-
-Both the light switch server and light switch client examples have provisionee role.
-They support provisioning over Advertising bearer (PB-ADV) and GATT bearer (PB-GATT) and also support
-Mesh Proxy Service (Server). Read more about the Proxy feature in @ref md_doc_getting_started_gatt_proxy.
-
-@note The *Proxy Client* role is **not** supported.
+Throughput test based on Nordics light switch example.
 
 
----
+## Setup
+- Download and install the [generic message model for mesh](https://github.com/stby4/nrf_mesh_generic_message_model).
+- Go to the 'nrf5SDKforMeshv310src\examples' folder
+- `git clone git@github.com:stby4/nrf_mesh_throughput.git throughput`
+- Open the 'throughput' folder. You will find seperate projects for the client, the server and the provisioner.
 
 
-## Hardware requirements @anchor light_switch_example_hw_requirements
+
+## Hardware requirements
 
 You need at least two supported boards for this example:
 
-- One nRF5 development board for the client.
-- One or more nRF5 development boards for the servers.
+- One nRF52840 development board for the client.
+- One or more nRF52840 development boards for the servers.
 
 Additionally, you need one of the following:
 - One nRF5 development board for the provisioner if you decide to use the static provisioner example.
-- @link_nrf_mesh_app (@link_nrf_mesh_app_ios or @link_nrf_mesh_app_android) if you decide to provision
-using the application.
-
-See @ref md_doc_introduction_mesh_compatibility for the supported boards.
+- _nRF Mesh_ app for [Android](https://play.google.com/store/apps/details?id=no.nordicsemi.android.nrfmeshprovisioner) or [iOS](https://apps.apple.com/us/app/nrf-mesh/id1380726771) if you decide to provision using the application.
 
 
 ---
 
 
-## Setup @anchor light_switch_example_setup
+## Testing
 
-You can find the source code of this example and its minor examples in the following folder:
-`<InstallFolder>/examples/light_switch`
-
-
-### LED and button assignments @anchor light_switch_example_setup_leds_buttons
-
-The buttons (1 to 4) are used to initiate certain actions, and the LEDs (1 to 4) are used to reflect
-the status of actions as follows:
-
-- Server:
-    -  During provisioning process:
-        - LED 3 and 4 blinking: Device identification active.
-		- LED 1 to 4: Blink four times to indicate provisioning process is completed.
-    - After provisioning and configuration is over:
-        - LED 1: Reflects the value of OnOff state on the server.
-				- LED ON: Value of the OnOff state is 1 (`true`).
-				- LED OFF: Value of the OnOff state is 0 (`false`).
-
-- Client:
-    - During provisioning process:
-        - LED 3 and 4 blinking: Device identification active.
-		- LED 1 to 4: Blink four times to indicate provisioning process is completed.
-    - After provisioning and configuration is over, buttons on the client are used to send OnOff Set
-        messages to the servers:
-        - Button 1: Send a message to the odd group (address: 0xC003) to turn on LED 1.
-        - Button 2: Send a message to the odd group (address: 0xC003) to turn off LED 1.
-        - Button 3: Send a message to the even group (address: 0xC002) to turn on LED 1.
-        - Button 4: Send a message to the even group (address: 0xC002) to turn off LED 1.
-
-- Provisioner:
-  - Button 1: Start provisioning.
-  - LED 1: Reflects the state of the provisioning.
-		- LED ON: Provisioning of the node is in progress.
-		- LED OFF: No ongoing provisioning process.
-  - LED 2: Reflects the state of the configuration.
-		- LED ON: Configuration of the node is in progress.
-		- LED OFF: No ongoing configuration process.
+To test the throughput, build the examples with Segger Embedded Studio.
 
 
-
----
-
-
-## Testing the example @anchor light_switch_example_testing
-
-To test the light switch example, build the examples by following the instructions in
-[Building the mesh stack](@ref md_doc_getting_started_how_to_build).
-
-@note
-If you have more than 30 boards for the servers and decided to use the static provisioner example,
-set `SERVER_NODE_COUNT` in `light_switch_example_common.h` to the number of boards available
-and rebuild the provisioner example.
+> If you have more than 30 boards for the servers and decided to use the static provisioner example, set `SERVER_NODE_COUNT` in `light_switch_example_common.h` to the number of boards available and rebuild the provisioner example.
 
 After building is complete, use one of the following methods, depending on the preferred
 provisioning approach:
-- [Evaluating using the static provisioner](@ref light_switch_example_testing_dk)
-- [Evaluating using the nRF Mesh mobile app](@ref light_switch_example_testing_app)
+- Evaluating using the static provisioner
+-[Evaluating using the nRF Mesh mobile app
 
-Once the provisioning is complete, you can start [interacting with the boards](@ref light_switch_example_testing_interacting).
+Once the provisioning is complete, you can start the throughput test.
 
-### Evaluating using the static provisioner @anchor light_switch_example_testing_dk
+### Evaluating using the static provisioner
+
+> So far, the static provisioner has not been implemented. Please use the nRF Mesh app or create your own provisioner.
 
 1. Flash the examples by following the instructions in @ref md_doc_getting_started_how_to_run_examples,
 including:
@@ -162,15 +69,14 @@ If the provisioner encounters an error during the provisioning or configuration 
 you can reset the provisioner to restart this process for that node.
 
 
-### Evaluating using the nRF Mesh mobile app @anchor light_switch_example_testing_app
+### Evaluating using the nRF Mesh mobile app
 
-1. Flash the examples by following the instructions in @ref md_doc_getting_started_how_to_run_examples,
-including:
+1. Flash the examples by following the instructions:
     1. Erase the flash of your development boards and program the SoftDevice.
     2. Flash the client firmware on individual boards and the server firmware on other board or boards.
 2. Open the nRF Mesh mobile app.
-3. Provision the nodes. The client board is `nRF5x Mesh Switch`,
-the server board is `nRF5x Mesh Light`.
+3. Provision the nodes. The client board is `nRF5x Message Client`,
+the server board is `nRF5x Message Server`.
 4. Bind the Generic OnOff client and server model instances on the nodes with the same app key:
     1. Select the Network tab.
     2. On the server board tile, tap the **Configure** button to open Node Configuration.
@@ -188,27 +94,11 @@ the server board is `nRF5x Mesh Light`.
     - group addresses -- if you choose this option, remember to subscribe the server nodes to these
     group addresses.
         
-@note
-You can also configure the publish address of the second Generic OnOff client model instance.
-Use one of the options mentioned in step 5 above. If you set the address the unicast address
-of any server node, the client example will be configured as follows:
-    - The Button 3 on the client board turns ON LED 1 on the corresponding server board.
-    - The Button 4 on the client board turns OFF LED 1 on the corresponding server board.
+> You can also configure the publish address of the second Generic OnOff client model instance. Use one of the options mentioned in step 5 above. If you set the address the unicast address of any server node, the client example will be configured as follows:
+>    - The Button 3 on the client board turns ON LED 1 on the corresponding server board.
+>    - The Button 4 on the client board turns OFF LED 1 on the corresponding server board.
 
 
-### Interacting with the boards @anchor light_switch_example_testing_interacting
+### Interacting with the boards
 
-Once the provisioning and the configuration of the client node and at least one of the server nodes are complete,
-you can press buttons on the client to see the LEDs getting toggled on the associated servers.
-See [LED and button assignments](@ref light_switch_example_setup_leds_buttons) section.
-
-If an RTT terminal is available and connected to the client, sending
-the ASCII numbers `0`--`3` will have the same effect as pressing the buttons.
-
-If you are using RTT log, you can also press Button 1 on the servers to locally toggle the state of their LED 1,
-and the status reflecting this state will be sent to the client board. You can see the status printed in
-the RTT log of the client board.
-
-If any of the devices is powered off and back on, it will remember its flash configuration
-and rejoin the network. For more information about the flash manager, see @ref md_doc_libraries_flash_manager.n R F 5 2   M e s h   T h r o u g h p u t   T e s t  
- 
+@todo
