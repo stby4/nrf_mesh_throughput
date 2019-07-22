@@ -78,6 +78,7 @@
 
 static volatile uint16_t test_byte_counter = 0;
 static volatile bool run = false;
+static volatile uint32_t test_timer_start;
 
 static generic_message_client_t m_clients[CLIENT_MODEL_INSTANCE_COUNT];
 static bool                   m_device_provisioned;
@@ -90,10 +91,13 @@ static void app_generic_message_client_status_cb(const generic_message_client_t 
 static void app_gen_message_client_transaction_status_cb(access_model_handle_t model_handle,
                                                        void * p_args,
                                                        access_reliable_status_t status);
+static void timeout_handler(void * p_context);
 static void send_message();
 static void run_test();
 static void start_test();
 static void stop_test();
+
+APP_TIMER_DEF(test_timer);
 
 const generic_message_client_callbacks_t client_cbs =
 {
@@ -211,14 +215,15 @@ static void run_test()
     if(run && test_byte_counter < APP_CONFIG_BYTE_TRANSFER_CNT) {
       send_message();
     } else {
-      // @todo print results
-      stop_test();
+      stop_test(); // and print results
     }
 }
 
 static void start_test()
 {
     if(!run) {
+      ERROR_CHECK(app_timer_start(test_timer, APP_TIMER_TICKS(1000 * 60 * 60), timeout_handler));
+      test_timer_start = app_timer_cnt_get();
       run = true;
       run_test();
     }
@@ -227,6 +232,20 @@ static void start_test()
 static void stop_test()
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Stopping test\n");
+
+
+    uint32_t time_ms      = app_timer_cnt_diff_compute(app_timer_cnt_get(), test_timer_start);
+    ERROR_CHECK(app_timer_stop(test_timer));
+
+    uint32_t bit_count    = (test_byte_counter * 8);
+    float throughput_kbps = ((bit_count / (time_ms / 1000.f)) / 1000.f);
+
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================");
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Time: %u.%.2u seconds elapsed.", (time_ms / 1000), (time_ms % 1000));
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %d Kbps.", throughput_kbps);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Sent %u bytes of ATT payload.", test_byte_counter);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================");
+
     run = false;
     test_byte_counter = 0;
 }
@@ -297,6 +316,10 @@ static void rtt_input_handler(int key)
     }
 }
 
+static void timeout_handler(void * p_context)
+{
+}
+
 static void models_init_cb(void)
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Initializing and adding models\n");
@@ -331,6 +354,7 @@ static void initialize(void)
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "----- BLE Mesh Light Switch Client Demo -----\n");
 
     ERROR_CHECK(app_timer_init());
+    ERROR_CHECK(app_timer_create(&test_timer, APP_TIMER_MODE_SINGLE_SHOT, timeout_handler));
     hal_leds_init();
 
 #if BUTTON_BOARD
