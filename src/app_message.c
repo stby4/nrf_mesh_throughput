@@ -108,11 +108,7 @@ static void message_state_process_timing(app_message_server_t * p_server)
 static void message_state_value_update(app_message_server_t * p_server)
 {
     /* Requirement: If delay and transition time is zero, current state changes to the target state. */
-    if ((p_server->state.delay_ms == 0 && p_server->state.remaining_time_ms == 0) ||
-    /* Requirement: If current state is 0 (checked earlier) and target state is 1, current state value changes
-     * to the target state value immediately after the delay.
-     */
-        (p_server->state.delay_ms == 0 && p_server->state.target_message == 1))
+    if ((p_server->state.delay_ms == 0 && p_server->state.remaining_time_ms == 0) || (p_server->state.delay_ms == 0))
     {
         p_server->state.present_message = p_server->state.target_message;
 
@@ -171,10 +167,13 @@ static void generic_message_state_get_cb(const generic_message_server_t * p_self
 
     app_message_server_t   * p_server = PARENT_BY_FIELD_GET(app_message_server_t, server, p_self);
 
-    /* Requirement: Provide the current value of the OnOff state */
+    /* Requirement: Provide the current message */
     p_server->message_get_cb(p_server, &p_server->state.present_message);
     p_out->present_message = p_server->state.present_message;
     p_out->target_message = p_server->state.target_message;
+
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Present message: %d\n", p_server->state.present_message);
+    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Target message: %d\n", p_server->state.target_message);
 
     /* Requirement: Always report remaining time */
     if (p_server->state.remaining_time_ms > 0 && p_server->state.delay_ms == 0)

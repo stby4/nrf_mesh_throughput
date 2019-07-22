@@ -101,9 +101,9 @@
 typedef struct
 {
     /** Present value of the message state */
-    uint8_t* present_message;
+    uint8_t * present_message;
     /** Target value of the message state, as received from the model interface. */
-    uint8_t* target_message;
+    uint8_t * target_message;
     /** Remaining time to reach `target_message`. */
     uint32_t remaining_time_ms;
     /** Time to delay the processing of received SET message. */
@@ -128,7 +128,7 @@ typedef struct __app_message_server_t app_message_server_t;
  * @param[in]   p_server        Pointer to @ref __app_message_server_t [app_message_server_t] context
  * @param[in]   message           New message value to be used by the application
  */
-typedef void (*app_message_set_cb_t)(const app_message_server_t * p_server, bool message);
+typedef void (*app_message_set_cb_t)(const app_message_server_t * p_server, uint8_t * message);
 
 /** Application state read callback prototype.
  * This callback is called by the app_model_behaviour.c whenever application message state is required
@@ -138,7 +138,7 @@ typedef void (*app_message_set_cb_t)(const app_message_server_t * p_server, bool
  * @param[out] p_present_message   User application fills this value with the value retrived from
  *                               the hardware interface.
  */
-typedef void (*app_message_get_cb_t)(const app_message_server_t * p_server, bool * p_present_message);
+typedef void (*app_message_get_cb_t)(const app_message_server_t * p_server, uint8_t ** p_present_message);
 
 /** Application level structure holding the message server model context and message state representation */
 struct __app_message_server_t

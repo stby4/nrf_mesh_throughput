@@ -75,10 +75,8 @@
 
 #define APP_UNACK_MSG_REPEAT_COUNT   (2)
 
-enum test_mode { ack, unack };
 
-static volatile uint8_t sel_test_mode = ack;
-static volatile uint16_t test_counter = 0;
+static volatile uint16_t test_byte_counter = 0;
 static volatile bool run = false;
 
 static generic_message_client_t m_clients[CLIENT_MODEL_INSTANCE_COUNT];
@@ -94,6 +92,7 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
                                                        access_reliable_status_t status);
 static void send_message();
 static void run_test();
+static void start_test();
 static void stop_test();
 
 const generic_message_client_callbacks_t client_cbs =
@@ -154,8 +153,7 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
     {
         case ACCESS_RELIABLE_TRANSFER_SUCCESS:
             //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer success.\n");
-            ++test_counter;
-            run_test();
+            test_byte_counter += APP_CONFIG_MESSAGE_SIZE;
             break;
 
         case ACCESS_RELIABLE_TRANSFER_TIMEOUT:
@@ -182,7 +180,7 @@ static void app_generic_message_client_status_cb(const generic_message_client_t 
 {
     if (p_in->remaining_time_ms > 0)
     {
-        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d, Target OnOff: %d, Remaining Time: %d ms\n",
+        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d: %d, Remaining Time: %d ms\n",
               p_meta->src.value, p_in->present_message, p_in->target_message, p_in->remaining_time_ms);
     }
     else
@@ -210,7 +208,7 @@ static void config_server_evt_cb(const config_server_evt_t * p_evt)
 
 static void run_test()
 {
-    if(run && test_counter < 10) {
+    if(run && test_byte_counter < APP_CONFIG_BYTE_TRANSFER_CNT) {
       send_message();
     } else {
       // @todo print results
@@ -218,11 +216,19 @@ static void run_test()
     }
 }
 
+static void start_test()
+{
+    if(!run) {
+      run = true;
+      run_test();
+    }
+}
+
 static void stop_test()
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Stopping test\n");
     run = false;
-    test_counter = 0;
+    test_byte_counter = 0;
 }
 
 static void send_message()
@@ -242,7 +248,7 @@ static void send_message()
         case NRF_ERROR_NO_MEM:
         case NRF_ERROR_BUSY:
         case NRF_ERROR_INVALID_STATE:
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Client %u cannot send\n", sel_test_mode);
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Client %u cannot send\n", 1);
             hal_led_blink_ms(LEDS_MASK, LED_BLINK_SHORT_INTERVAL_MS, LED_BLINK_CNT_NO_REPLY);
             break;
 
@@ -254,7 +260,7 @@ static void send_message()
              * It is the provisioner that adds an application key, binds it to the model and sets
              * the model's publication state.
              */
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Publication not configured for client %u\n", sel_test_mode);
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Publication not configured for client %u\n", 1);
             break;
 
         default:
@@ -269,26 +275,14 @@ static void button_event_handler(uint32_t button_number)
 
 
     /* Button 1: Run, Button 2: Stop, Client[0]
-     * Button 2: Run, Button 3: Stop, Client[1]
      */
     switch (button_number)
     {
         case 0:
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in acknowledged mode\n");
-            sel_test_mode = ack;
-            run = true;
-            run_test();
+            start_test();
             break;
         case 1:
-            stop_test();
-            break;
-        case 2:
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in unacknowledged mode\n");
-            sel_test_mode = unack;
-            run = true;
-            run_test();
-            break;
-        case 3:
             stop_test();
             break;
     }
@@ -296,7 +290,7 @@ static void button_event_handler(uint32_t button_number)
 
 static void rtt_input_handler(int key)
 {
-    if (key >= '0' && key <= '3')
+    if (key >= '0' && key <= '1')
     {
         uint32_t button_number = key - '0';
         button_event_handler(button_number);

@@ -76,10 +76,11 @@
 #define APP_MESSAGE_ELEMENT_INDEX     (0)
 
 static bool m_device_provisioned;
+static uint8_t message[256];
 
 /*************************************************************************************************/
 static void app_message_server_set_cb(const app_message_server_t * p_server, uint8_t * message);
-static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t * p_present_message);
+static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t ** p_present_message);
 static void send_message();
 
 /* Generic message server structure definition and initialization */
@@ -100,12 +101,12 @@ static void app_message_server_set_cb(const app_message_server_t * p_server, uin
 }
 
 /* Callback for reading the hardware state */
-static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t * p_present_message)
+static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t ** p_present_message)
 {
     /* Resolve the server instance here if required, this example uses only 1 instance. */
-    static uint8_t message[256];
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message to send: %d\n", message)
     *p_present_message = message;
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message to send: %d\n", *p_present_message)
     //*p_present_message = hal_led_pin_get(MESSAGE_SERVER_0_LED);
 }
 
