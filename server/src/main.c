@@ -80,6 +80,7 @@ static bool m_device_provisioned;
 /*************************************************************************************************/
 static void app_message_server_set_cb(const app_message_server_t * p_server, uint8_t * message);
 static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t * p_present_message);
+static void send_message();
 
 /* Generic message server structure definition and initialization */
 APP_MESSAGE_SERVER_DEF(m_message_server_0,
@@ -95,7 +96,7 @@ static void app_message_server_set_cb(const app_message_server_t * p_server, uin
 
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message received: %d\n", message)
 
-    //hal_led_pin_set(MESSAGE_SERVER_0_LED, message);
+    hal_led_pin_set(MESSAGE_SERVER_0_LED, message);
 }
 
 /* Callback for reading the hardware state */
@@ -141,6 +142,7 @@ static void button_event_handler(uint32_t button_number)
         /* Pressing SW1 on the Development Kit will result in LED state to toggle and trigger
         the STATUS message to inform client about the state change. This is a demonstration of
         state change publication due to local event. */
+        /*
         case 0:
         {
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "User action \n");
@@ -148,6 +150,7 @@ static void button_event_handler(uint32_t button_number)
             app_message_status_publish(&m_message_server_0);
             break;
         }
+        */
 
         /* Initiate node reset */
         case 3:

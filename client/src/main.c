@@ -75,6 +75,12 @@
 
 #define APP_UNACK_MSG_REPEAT_COUNT   (2)
 
+enum test_mode { ack, unack };
+
+static volatile uint8_t sel_test_mode = ack;
+static volatile uint16_t test_counter = 0;
+static volatile bool run = false;
+
 static generic_message_client_t m_clients[CLIENT_MODEL_INSTANCE_COUNT];
 static bool                   m_device_provisioned;
 
@@ -86,6 +92,9 @@ static void app_generic_message_client_status_cb(const generic_message_client_t 
 static void app_gen_message_client_transaction_status_cb(access_model_handle_t model_handle,
                                                        void * p_args,
                                                        access_reliable_status_t status);
+static void send_message();
+static void run_test();
+static void stop_test();
 
 const generic_message_client_callbacks_t client_cbs =
 {
@@ -144,7 +153,9 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
     switch(status)
     {
         case ACCESS_RELIABLE_TRANSFER_SUCCESS:
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer success.\n");
+            //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer success.\n");
+            ++test_counter;
+            run_test();
             break;
 
         case ACCESS_RELIABLE_TRANSFER_TIMEOUT:
@@ -160,21 +171,23 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
             ERROR_CHECK(NRF_ERROR_INTERNAL);
             break;
     }
+
+    run_test();
 }
 
-/* Generic OnOff client model interface: Process the received status message in this callback */
+/* Generic message client model interface: Process the received status message in this callback */
 static void app_generic_message_client_status_cb(const generic_message_client_t * p_self,
                                                const access_message_rx_meta_t * p_meta,
                                                const generic_message_status_params_t * p_in)
 {
     if (p_in->remaining_time_ms > 0)
     {
-        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "OnOff server: 0x%04x, Present OnOff: %d, Target OnOff: %d, Remaining Time: %d ms\n",
+        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d, Target OnOff: %d, Remaining Time: %d ms\n",
               p_meta->src.value, p_in->present_message, p_in->target_message, p_in->remaining_time_ms);
     }
     else
     {
-        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "OnOff server: 0x%04x, Present OnOff: %d\n",
+        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n",
               p_meta->src.value, p_in->present_message);
     }
 }
@@ -195,59 +208,31 @@ static void config_server_evt_cb(const config_server_evt_t * p_evt)
     }
 }
 
-static void button_event_handler(uint32_t button_number)
+static void run_test()
 {
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Button %u pressed\n", button_number);
+    if(run && test_counter < 10) {
+      send_message();
+    } else {
+      // @todo print results
+      stop_test();
+    }
+}
 
+static void stop_test()
+{
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Stopping test\n");
+    run = false;
+    test_counter = 0;
+}
+
+static void send_message()
+{
     uint32_t status = NRF_SUCCESS;
-    generic_message_set_params_t set_params;
-    model_transition_t transition_params;
-    static uint8_t tid = 0;
-    static uint8_t message[256];
 
-    /* Button 1: On, Button 2: Off, Client[0]
-     * Button 2: On, Button 3: Off, Client[1]
-     */
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Requesting message\n");
 
-/*
-    switch(button_number)
-    {
-        case 0:
-        case 2:
-            set_params.message = APP_STATE_ON;
-            break;
-
-        case 1:
-        case 3:
-            set_params.message = APP_STATE_OFF;
-            break;
-    }
-*/
-    set_params.message = message;
-    set_params.tid = tid++;
-    transition_params.delay_ms = APP_CONFIG_MESSAGE_DELAY_MS;
-    transition_params.transition_time_ms = APP_CONFIG_MESSAGE_TRANSITION_TIME_MS;
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Sending msg: MESSAGE SET %d\n", set_params.message);
-
-    switch (button_number)
-    {
-        case 0:
-        case 1:
-            /* Demonstrate acknowledged transaction, using 1st client model instance */
-            /* In this examples, users will not be blocked if the model is busy */
-            (void)access_model_reliable_cancel(m_clients[0].model_handle);
-            status = generic_message_client_set(&m_clients[0], &set_params, &transition_params);
-            hal_led_pin_set(BSP_LED_0, set_params.message);
-            break;
-
-        case 2:
-        case 3:
-            /* Demonstrate un-acknowledged transaction, using 2nd client model instance */
-            status = generic_message_client_set_unack(&m_clients[1], &set_params,
-                                                    &transition_params, APP_UNACK_MSG_REPEAT_COUNT);
-            hal_led_pin_set(BSP_LED_1, set_params.message);
-            break;
-    }
+    //(void)access_model_reliable_cancel(m_clients[0].model_handle);
+    status = generic_message_client_get(&m_clients[0]);
 
     switch (status)
     {
@@ -257,7 +242,7 @@ static void button_event_handler(uint32_t button_number)
         case NRF_ERROR_NO_MEM:
         case NRF_ERROR_BUSY:
         case NRF_ERROR_INVALID_STATE:
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Client %u cannot send\n", button_number);
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Client %u cannot send\n", sel_test_mode);
             hal_led_blink_ms(LEDS_MASK, LED_BLINK_SHORT_INTERVAL_MS, LED_BLINK_CNT_NO_REPLY);
             break;
 
@@ -269,11 +254,42 @@ static void button_event_handler(uint32_t button_number)
              * It is the provisioner that adds an application key, binds it to the model and sets
              * the model's publication state.
              */
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Publication not configured for client %u\n", button_number);
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Publication not configured for client %u\n", sel_test_mode);
             break;
 
         default:
             ERROR_CHECK(status);
+            break;
+    }
+}
+
+static void button_event_handler(uint32_t button_number)
+{
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Button %u pressed\n", button_number);
+
+
+    /* Button 1: Run, Button 2: Stop, Client[0]
+     * Button 2: Run, Button 3: Stop, Client[1]
+     */
+    switch (button_number)
+    {
+        case 0:
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in acknowledged mode\n");
+            sel_test_mode = ack;
+            run = true;
+            run_test();
+            break;
+        case 1:
+            stop_test();
+            break;
+        case 2:
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in unacknowledged mode\n");
+            sel_test_mode = unack;
+            run = true;
+            run_test();
+            break;
+        case 3:
+            stop_test();
             break;
     }
 }

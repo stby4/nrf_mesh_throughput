@@ -11,10 +11,11 @@
  <Memory3/>
  <Memory4/>
  <Project>
-  <ProjectSessionItem path="light_switch_provisioner_nrf52840_xxAA_s140_6.1.0"/>
-  <ProjectSessionItem path="light_switch_provisioner_nrf52840_xxAA_s140_6.1.0;light_switch_provisioner_nrf52840_xxAA_s140_6.1.0"/>
-  <ProjectSessionItem path="light_switch_provisioner_nrf52840_xxAA_s140_6.1.0;light_switch_provisioner_nrf52840_xxAA_s140_6.1.0;Application"/>
-  <ProjectSessionItem path="light_switch_provisioner_nrf52840_xxAA_s140_6.1.0;light_switch_provisioner_nrf52840_xxAA_s140_6.1.0;Provisioning"/>
+  <ProjectSessionItem path="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0"/>
+  <ProjectSessionItem path="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0;mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0"/>
+  <ProjectSessionItem path="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0;mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0;Application"/>
+  <ProjectSessionItem path="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0;mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0;Mesh stack"/>
+  <ProjectSessionItem path="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0;mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0;Provisioning"/>
  </Project>
  <Register1/>
  <Register2/>
@@ -40,9 +41,8 @@
  </Watch4>
  <Files>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../doc/getting_started/SES.md" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../mesh/prov/src/provisioning.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="362" useTextEdit="1" useBinaryEdit="0" left="0" path="src/provisioner_helper.c" selected="0" top="351" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="446" useTextEdit="1" useBinaryEdit="0" left="0" path="src/node_setup.c" selected="1" top="440" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="446" useTextEdit="1" useBinaryEdit="0" left="0" path="src/node_setup.c" selected="1" top="110" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="71" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="0" top="60" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="light_switch_provisioner_nrf52840_xxAA_s140_6.1.0" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
+ <ARMCrossStudioWindow activeProject="mesh_throughput_provisioner_nrf52840_xxAA_s140_6.1.0" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

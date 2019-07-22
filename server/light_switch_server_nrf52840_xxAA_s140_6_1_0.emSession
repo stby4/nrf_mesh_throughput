@@ -1,7 +1,9 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
  <Bookmarks/>
- <Breakpoints groups="Breakpoints" active_group="Breakpoints"/>
+ <Breakpoints groups="Breakpoints" active_group="Breakpoints">
+  <BreakpointListItem trigger="" line="105" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="src/main.c" useHWbreakpoint="false"/>
+ </Breakpoints>
  <ExecutionProfileWindow/>
  <FrameBufferWindow>
   <FrameBufferWindow bufferHeight="-1" addressSpace="" addressText="" bufferWidth="-1"/>
@@ -11,9 +13,9 @@
  <Memory3/>
  <Memory4/>
  <Project>
-  <ProjectSessionItem path="mesh_throughput_nrf52840_xxAA"/>
-  <ProjectSessionItem path="mesh_throughput_nrf52840_xxAA;mesh_throughput_nrf52840_xxAA"/>
-  <ProjectSessionItem path="mesh_throughput_nrf52840_xxAA;mesh_throughput_nrf52840_xxAA;Application"/>
+  <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA"/>
+  <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA;mesh_throughput_server_nrf52840_xxAA"/>
+  <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA;mesh_throughput_server_nrf52840_xxAA;Application"/>
  </Project>
  <Register1/>
  <Register2/>
@@ -38,9 +40,11 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="46" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="0" top="36" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="54" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="0" top="42" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1" useTextEdit="1" useBinaryEdit="0" left="0" path="light_switch_server_nrf52840_xxAA_s140_6_1_0.emProject" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="33" y="141" useTextEdit="1" useBinaryEdit="0" left="23" path="include/sdk_config.h" selected="1" top="124" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="47" y="88" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="0" top="87" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="65" y="179" useTextEdit="1" useBinaryEdit="0" left="0" path="light_switch_server_nrf52840_xxAA_s140_6_1_0.emProject" selected="0" top="163" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="26" y="253" useTextEdit="1" useBinaryEdit="0" left="0" path="../src/app_message.c" selected="0" top="104" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="204" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../models/model_spec/generic_message/src/generic_message_server.c" selected="0" top="175" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="mesh_throughput_nrf52840_xxAA" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
+ <ARMCrossStudioWindow activeProject="mesh_throughput_server_nrf52840_xxAA" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>
