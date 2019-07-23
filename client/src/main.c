@@ -77,6 +77,8 @@
 
 
 static volatile uint16_t test_byte_counter = 0;
+static volatile uint16_t rssi_sum = 0;
+static volatile uint16_t rssi_count = 0;
 static volatile bool run = false;
 static volatile uint32_t test_timer_start;
 
@@ -157,7 +159,6 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
     {
         case ACCESS_RELIABLE_TRANSFER_SUCCESS:
             //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer success.\n");
-            test_byte_counter += APP_CONFIG_MESSAGE_SIZE;
             break;
 
         case ACCESS_RELIABLE_TRANSFER_TIMEOUT:
@@ -182,16 +183,14 @@ static void app_generic_message_client_status_cb(const generic_message_client_t 
                                                const access_message_rx_meta_t * p_meta,
                                                const generic_message_status_params_t * p_in)
 {
-    if (p_in->remaining_time_ms > 0)
-    {
-        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d: %d, Remaining Time: %d ms\n",
-              p_meta->src.value, p_in->present_message, p_in->target_message, p_in->remaining_time_ms);
-    }
-    else
-    {
-        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n",
-              p_meta->src.value, p_in->present_message);
-    }
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Bytes received: %d\n", test_byte_counter);
+    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n", p_meta->src.value, p_in->present_message);
+    
+    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
+    
+    ++rssi_count;
+    rssi_sum += p_meta->p_core_metadata->params.scanner.rssi;
+    test_byte_counter += APP_CONFIG_MESSAGE_SIZE;
 }
 
 static void node_reset(void)
@@ -221,7 +220,10 @@ static void run_test()
 
 static void start_test()
 {
-    if(!run) {
+    if(!run) {  
+      test_byte_counter = 0;
+      rssi_count = 0;
+      rssi_sum = 0;
       ERROR_CHECK(app_timer_start(test_timer, APP_TIMER_TICKS(1000 * 60 * 60), timeout_handler));
       test_timer_start = app_timer_cnt_get();
       run = true;
@@ -237,17 +239,19 @@ static void stop_test()
     uint32_t time_ms      = app_timer_cnt_diff_compute(app_timer_cnt_get(), test_timer_start);
     ERROR_CHECK(app_timer_stop(test_timer));
 
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================\n");
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Time: %u.%.2u seconds elapsed.\n", (time_ms / 1000), (time_ms % 1000));
+
     uint32_t bit_count    = (test_byte_counter * 8);
     float throughput_kbps = ((bit_count / (time_ms / 1000.f)) / 1000.f);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %f Kbps.\n", throughput_kbps);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Received %u bytes of payload.\n", test_byte_counter);
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================");
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Time: %u.%.2u seconds elapsed.", (time_ms / 1000), (time_ms % 1000));
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %d Kbps.", throughput_kbps);
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Sent %u bytes of ATT payload.", test_byte_counter);
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================");
+    float avg_rssi = 0 == rssi_count ? 0. : (float)rssi_sum / rssi_count;
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Average RSSI: %f\n", avg_rssi);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================\n");
 
     run = false;
-    test_byte_counter = 0;
 }
 
 static void send_message()

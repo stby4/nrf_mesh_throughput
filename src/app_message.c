@@ -164,6 +164,7 @@ static void generic_message_state_get_cb(const generic_message_server_t * p_self
                                        generic_message_status_params_t * p_out)
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "msg: GET \n");
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
 
     app_message_server_t   * p_server = PARENT_BY_FIELD_GET(app_message_server_t, server, p_self);
 
