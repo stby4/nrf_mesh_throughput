@@ -62,9 +62,9 @@
  </Watch4>
  <Files>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="6473" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="0" top="6463" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="47" y="89" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="0" top="112" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="65" y="182" useTextEdit="1" useBinaryEdit="0" left="0" path="../src/app_message.c" selected="1" top="157" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="89" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="0" top="68" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="182" useTextEdit="1" useBinaryEdit="0" left="0" path="../src/app_message.c" selected="1" top="157" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="158" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../models/model_spec/generic_message/src/generic_message_server.c" selected="0" top="140" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="mesh_throughput_server_nrf52840_xxAA" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="mesh_throughput_server_nrf52840_xxAA" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

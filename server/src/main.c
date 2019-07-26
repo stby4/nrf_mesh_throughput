@@ -136,21 +136,29 @@ static void config_server_evt_cb(const config_server_evt_t * p_evt)
 
 static void button_event_handler(uint32_t button_number)
 {
+    uint32_t status;
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Button %u pressed\n", button_number);
     switch (button_number)
     {
         /* Pressing SW1 on the Development Kit will result in LED state to toggle and trigger
         the STATUS message to inform client about the state change. This is a demonstration of
         state change publication due to local event. */
-        /*
         case 0:
         {
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "User action \n");
             hal_led_pin_set(MESSAGE_SERVER_0_LED, !hal_led_pin_get(MESSAGE_SERVER_0_LED));
-            app_message_status_publish(&m_message_server_0);
+            status = app_message_publish(&m_message_server_0, message);         
+
+            if(NRF_SUCCESS == status)
+            {
+                __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message sent: &d\n", message);
+            }
+            else
+            {
+                __LOG(LOG_SRC_APP, LOG_LEVEL_ERROR, "Could not send message. Status: %d\n", status);
+            }
             break;
         }
-        */
 
         /* Initiate node reset */
         case 3:

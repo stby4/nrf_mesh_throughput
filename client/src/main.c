@@ -75,6 +75,11 @@
 
 #define APP_UNACK_MSG_REPEAT_COUNT   (2)
 
+enum TEST_MODE {
+    GET,
+    SET
+};
+
 
 static volatile uint16_t test_byte_counter = 0;
 static volatile uint16_t rssi_sum = 0;
@@ -94,7 +99,8 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
                                                        void * p_args,
                                                        access_reliable_status_t status);
 static void timeout_handler(void * p_context);
-static void send_message();
+static void send_get_message();
+static void send_set_message();
 static void run_test();
 static void start_test();
 static void stop_test();
@@ -184,7 +190,7 @@ static void app_generic_message_client_status_cb(const generic_message_client_t 
                                                const generic_message_status_params_t * p_in)
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Bytes received: %d\n", test_byte_counter);
-    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n", p_meta->src.value, p_in->present_message);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n", p_meta->src.value, p_in->present_message);
     
     //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
     
@@ -212,7 +218,7 @@ static void config_server_evt_cb(const config_server_evt_t * p_evt)
 static void run_test()
 {
     if(run && test_byte_counter < APP_CONFIG_BYTE_TRANSFER_CNT) {
-      send_message();
+      send_get_message();
     } else {
       stop_test(); // and print results
     }
@@ -248,13 +254,13 @@ static void stop_test()
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Received %u bytes of payload.\n", test_byte_counter);
 
     float avg_rssi = 0 == rssi_count ? 0. : (float)rssi_sum / rssi_count;
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Average RSSI: %f\n", avg_rssi);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Average RSSI: %d\n", avg_rssi);
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================\n");
 
     run = false;
 }
 
-static void send_message()
+static void send_get_message()
 {
     uint32_t status = NRF_SUCCESS;
 
@@ -290,6 +296,17 @@ static void send_message()
             ERROR_CHECK(status);
             break;
     }
+}
+
+static void send_set_message()
+{
+    uint32_t status = NRF_SUCCESS;
+
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Sending message\n");
+
+    //(void)access_model_reliable_cancel(m_clients[0].model_handle);
+    //status = generic_message_client_set(&m_clients[0]);
+
 }
 
 static void button_event_handler(uint32_t button_number)

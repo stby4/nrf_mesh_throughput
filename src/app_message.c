@@ -116,7 +116,7 @@ static void message_state_value_update(app_message_server_t * p_server)
         status_params.present_message = p_server->state.present_message;
         status_params.target_message = p_server->state.target_message;
         status_params.remaining_time_ms = p_server->state.remaining_time_ms;
-        (void) generic_message_server_status_publish(&p_server->server, &status_params);
+        uint32_t success = generic_message_server_status_publish(&p_server->server, &status_params);
 
         if (!p_server->value_updated)
         {
@@ -234,21 +234,20 @@ static void generic_message_state_set_cb(const generic_message_server_t * p_self
 
 /***** Interface functions *****/
 
-void app_message_status_publish(app_message_server_t * p_server)
+uint32_t app_message_publish(app_message_server_t * p_server, uint8_t * message)
 {
-    p_server->message_get_cb(p_server, &p_server->state.present_message);
-
-    p_server->state.target_message = p_server->state.present_message;
+    p_server->state.target_message = message;
     p_server->state.delay_ms = 0;
     p_server->state.remaining_time_ms = 0;
     (void) app_timer_stop(*p_server->p_timer_id);
 
     generic_message_status_params_t status = {
-                .present_message = p_server->state.present_message,
-                .target_message = p_server->state.target_message,
+                .present_message = message,
+                .target_message = message,
                 .remaining_time_ms = p_server->state.remaining_time_ms
             };
-    (void) generic_message_server_status_publish(&p_server->server, &status);
+    return generic_message_server_status_publish(&p_server->server, &status);
+    
 }
 
 uint32_t app_message_init(app_message_server_t * p_server, uint8_t element_index)
