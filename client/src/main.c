@@ -180,8 +180,6 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
             ERROR_CHECK(NRF_ERROR_INTERNAL);
             break;
     }
-
-    run_test();
 }
 
 /* Generic message client model interface: Process the received status message in this callback */
@@ -190,13 +188,15 @@ static void app_generic_message_client_status_cb(const generic_message_client_t 
                                                const generic_message_status_params_t * p_in)
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Bytes received: %d\n", test_byte_counter);
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n", p_meta->src.value, p_in->present_message);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n", p_meta->src.value, p_in->message);
     
     //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
     
     ++rssi_count;
     rssi_sum += p_meta->p_core_metadata->params.scanner.rssi;
     test_byte_counter += APP_CONFIG_MESSAGE_SIZE;
+
+    run_test();
 }
 
 static void node_reset(void)

@@ -110,23 +110,20 @@ static void message_state_value_update(app_message_server_t * p_server)
     /* Requirement: If delay and transition time is zero, current state changes to the target state. */
     if ((p_server->state.delay_ms == 0 && p_server->state.remaining_time_ms == 0) || (p_server->state.delay_ms == 0))
     {
-        p_server->state.present_message = p_server->state.target_message;
-
         generic_message_status_params_t status_params;
-        status_params.present_message = p_server->state.present_message;
-        status_params.target_message = p_server->state.target_message;
+        status_params.message = p_server->state.message;
         status_params.remaining_time_ms = p_server->state.remaining_time_ms;
         uint32_t success = generic_message_server_status_publish(&p_server->server, &status_params);
 
         if (!p_server->value_updated)
         {
-            p_server->message_set_cb(p_server, p_server->state.present_message);
+            p_server->message_set_cb(p_server, p_server->state.message);
             p_server->value_updated = true;
         }
     }
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_DBG1, "cur message: %d  target: %d  delay: %d ms  remaining time: %d ms\n",
-          p_server->state.present_message, p_server->state.target_message, p_server->state.delay_ms, p_server->state.remaining_time_ms);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_DBG1, "cur message: %d delay: %d ms  remaining time: %d ms\n",
+          p_server->state.message, p_server->state.delay_ms, p_server->state.remaining_time_ms);
 }
 
 static void message_state_timer_cb(void * p_context)
@@ -169,12 +166,10 @@ static void generic_message_state_get_cb(const generic_message_server_t * p_self
     app_message_server_t   * p_server = PARENT_BY_FIELD_GET(app_message_server_t, server, p_self);
 
     /* Requirement: Provide the current message */
-    p_server->message_get_cb(p_server, &p_server->state.present_message);
-    p_out->present_message = p_server->state.present_message;
-    p_out->target_message = p_server->state.target_message;
+    p_server->message_get_cb(p_server, &p_server->state.message);
+    p_out->message = p_server->state.message;
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Present message: %d\n", p_server->state.present_message);
-    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Target message: %d\n", p_server->state.target_message);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message: %d\n", p_server->state.message);
 
     /* Requirement: Always report remaining time */
     if (p_server->state.remaining_time_ms > 0 && p_server->state.delay_ms == 0)
@@ -207,7 +202,7 @@ static void generic_message_state_set_cb(const generic_message_server_t * p_self
 
     /* Update internal representation of OnOff value, process timing */
     p_server->value_updated = false;
-    p_server->state.target_message = p_in->message;
+    p_server->state.message = p_in->message;
     if (p_in_transition == NULL)
     {
         p_server->state.delay_ms = 0;
@@ -225,8 +220,7 @@ static void generic_message_state_set_cb(const generic_message_server_t * p_self
     /* Prepare response */
     if (p_out != NULL)
     {
-        p_out->present_message = p_server->state.present_message;
-        p_out->target_message = p_server->state.target_message;
+        p_out->message = p_server->state.message;
         p_out->remaining_time_ms = p_server->state.remaining_time_ms;
     }
 }
@@ -236,14 +230,13 @@ static void generic_message_state_set_cb(const generic_message_server_t * p_self
 
 uint32_t app_message_publish(app_message_server_t * p_server, uint8_t * message)
 {
-    p_server->state.target_message = message;
+    p_server->state.message = message;
     p_server->state.delay_ms = 0;
     p_server->state.remaining_time_ms = 0;
     (void) app_timer_stop(*p_server->p_timer_id);
 
     generic_message_status_params_t status = {
-                .present_message = message,
-                .target_message = message,
+                .message = message,
                 .remaining_time_ms = p_server->state.remaining_time_ms
             };
     return generic_message_server_status_publish(&p_server->server, &status);
