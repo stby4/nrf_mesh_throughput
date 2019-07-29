@@ -76,11 +76,11 @@
 #define APP_MESSAGE_ELEMENT_INDEX     (0)
 
 static bool m_device_provisioned;
-static uint8_t message[APP_CONFIG_MESSAGE_SIZE];
+static uint8_t * message = "Hello world";
 
 /*************************************************************************************************/
 static void app_message_server_set_cb(const app_message_server_t * p_server, uint8_t * message);
-static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t * p_message);
+static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t ** p_message);
 static void send_message();
 
 /* Generic message server structure definition and initialization */
@@ -95,17 +95,17 @@ static void app_message_server_set_cb(const app_message_server_t * p_server, uin
 {
     /* Resolve the server instance here if required, this example uses only 1 instance. */
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message received: %d\n", message)
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message received: %s\n", message)
 
     hal_led_pin_set(MESSAGE_SERVER_0_LED, message);
 }
 
 /* Callback for reading the hardware state */
-static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t * p_message)
+static void app_message_server_get_cb(const app_message_server_t * p_server, uint8_t ** p_message)
 {
     /* Resolve the server instance here if required, this example uses only 1 instance. */
-    p_message = message;
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message to send: %d\n", p_message)
+    *p_message = &message;
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message to send: %s\n", *p_message)
 }
 
 static void app_model_init(void)
@@ -146,11 +146,11 @@ static void button_event_handler(uint32_t button_number)
         {
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "User action \n");
             hal_led_pin_set(MESSAGE_SERVER_0_LED, !hal_led_pin_get(MESSAGE_SERVER_0_LED));
-            status = app_message_publish(&m_message_server_0, message);         
+            status = app_message_publish(&m_message_server_0, &message);         
 
             if(NRF_SUCCESS == status)
             {
-                __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message sent: %d\n", message);
+                __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message sent: %s\n", message);
             }
             else
             {

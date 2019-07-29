@@ -82,7 +82,7 @@ enum TEST_MODE {
 
 
 static volatile uint16_t test_byte_counter = 0;
-static volatile uint16_t rssi_sum = 0;
+static volatile int32_t rssi_sum = 0;
 static volatile uint16_t rssi_count = 0;
 static volatile bool run = false;
 static volatile uint32_t test_timer_start;
@@ -188,7 +188,7 @@ static void app_generic_message_client_status_cb(const generic_message_client_t 
                                                const generic_message_status_params_t * p_in)
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Bytes received: %d\n", test_byte_counter);
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %d\n", p_meta->src.value, p_in->message);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %s\n", p_meta->src.value, &p_in->message);
     
     //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
     
@@ -231,7 +231,7 @@ static void start_test()
       rssi_count = 0;
       rssi_sum = 0;
       ERROR_CHECK(app_timer_start(test_timer, APP_TIMER_TICKS(1000 * 60 * 60), timeout_handler));
-      test_timer_start = app_timer_cnt_get();
+      test_timer_start = MODEL_TIMER_PERIOD_MS_GET(app_timer_cnt_get());
       run = true;
       run_test();
     }
@@ -242,19 +242,23 @@ static void stop_test()
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Stopping test\n");
 
 
-    uint32_t time_ms      = app_timer_cnt_diff_compute(app_timer_cnt_get(), test_timer_start);
+    //uint32_t time_ticks   = app_timer_cnt_diff_compute(app_timer_cnt_get(), test_timer_start);
+    uint32_t time_ms      = MODEL_TIMER_PERIOD_MS_GET(app_timer_cnt_get()) - test_timer_start;
     ERROR_CHECK(app_timer_stop(test_timer));
 
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================\n");
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Time: %u.%.2u seconds elapsed.\n", (time_ms / 1000), (time_ms % 1000));
 
     uint32_t bit_count    = (test_byte_counter * 8);
-    float throughput_kbps = ((bit_count / (time_ms / 1000.f)) / 1000.f);
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %f Kbps.\n", throughput_kbps);
+    float throughput_kbps = (bit_count / (time_ms / 1000.f));
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %u.%.2u Kbps.\n", (uint8_t)throughput_kbps/1000, ((uint8_t)throughput_kbps)%1000);
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Received %u bytes of payload.\n", test_byte_counter);
 
-    float avg_rssi = 0 == rssi_count ? 0. : (float)rssi_sum / rssi_count;
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Average RSSI: %d\n", avg_rssi);
+    if(0 != rssi_sum) 
+    {
+        int32_t avg_rssi = (int32_t)((float)rssi_sum / (float)rssi_count);
+        __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Average RSSI: %d dBm\n", avg_rssi);
+    }
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================\n");
 
     run = false;
@@ -339,6 +343,7 @@ static void rtt_input_handler(int key)
 
 static void timeout_handler(void * p_context)
 {
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Timeout handler called\n");
 }
 
 static void models_init_cb(void)

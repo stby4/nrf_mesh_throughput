@@ -122,7 +122,7 @@ static void message_state_value_update(app_message_server_t * p_server)
         }
     }
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_DBG1, "cur message: %d delay: %d ms  remaining time: %d ms\n",
+    __LOG(LOG_SRC_APP, LOG_LEVEL_DBG1, "cur message: %s delay: %d ms  remaining time: %d ms\n",
           p_server->state.message, p_server->state.delay_ms, p_server->state.remaining_time_ms);
 }
 
@@ -169,7 +169,7 @@ static void generic_message_state_get_cb(const generic_message_server_t * p_self
     p_server->message_get_cb(p_server, &p_server->state.message);
     p_out->message = p_server->state.message;
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message: %d\n", p_server->state.message);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message: %s\n", &p_server->state.message);
 
     /* Requirement: Always report remaining time */
     if (p_server->state.remaining_time_ms > 0 && p_server->state.delay_ms == 0)

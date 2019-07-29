@@ -2,11 +2,15 @@
 <session>
  <Bookmarks/>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
+  <BreakpointListItem trigger="" line="1181" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../mesh/access/src/access.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="1183" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../../../mesh/access/src/access.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="446" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../mesh/access/src/access.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="465" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../mesh/access/src/access.c" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="111" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../src/app_message.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="171" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../src/app_message.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="171" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/app_message.c" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="207" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/app_message.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="242" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/app_message.c" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="156" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../../../models/model_spec/generic_message/src/generic_message_server.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="62" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../models/model_spec/generic_message/src/generic_message_server.c" useHWbreakpoint="false"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
  <FrameBufferWindow>
@@ -27,7 +31,9 @@
  <Project>
   <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA"/>
   <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA;mesh_throughput_server_nrf52840_xxAA"/>
+  <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA;mesh_throughput_server_nrf52840_xxAA;Access"/>
   <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA;mesh_throughput_server_nrf52840_xxAA;Application"/>
+  <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA;mesh_throughput_server_nrf52840_xxAA;GATT"/>
   <ProjectSessionItem path="mesh_throughput_server_nrf52840_xxAA;mesh_throughput_server_nrf52840_xxAA;Generic Message Model"/>
  </Project>
  <Register1>
@@ -61,10 +67,12 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="6473" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="0" top="6463" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="89" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="0" top="68" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="182" useTextEdit="1" useBinaryEdit="0" left="0" path="../src/app_message.c" selected="1" top="157" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="158" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../models/model_spec/generic_message/src/generic_message_server.c" selected="0" top="140" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="10105" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="0" top="10091" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="82" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../models/model_spec/generic_message/src/generic_message_server.c" selected="0" top="65" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="73" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="1" top="67" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="48" y="148" useTextEdit="1" useBinaryEdit="0" left="0" path="../src/app_message.c" selected="0" top="147" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="406" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../mesh/gatt/src/proxy.c" selected="0" top="380" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="443" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../mesh/access/src/access.c" selected="0" top="440" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="mesh_throughput_server_nrf52840_xxAA" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
+ <ARMCrossStudioWindow activeProject="mesh_throughput_server_nrf52840_xxAA" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>
