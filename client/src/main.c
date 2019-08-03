@@ -76,11 +76,12 @@
 #define APP_UNACK_MSG_REPEAT_COUNT   (2)
 
 enum TEST_MODE {
-    GET,
-    SET
+    ACK,
+    UNACK
 };
 
 
+static volatile uint8_t test_mode = ACK;
 static volatile uint16_t test_byte_counter = 0;
 static volatile int32_t rssi_sum = 0;
 static volatile uint16_t rssi_count = 0;
@@ -249,9 +250,9 @@ static void stop_test()
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================\n");
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Time: %u.%.2u seconds elapsed.\n", (time_ms / 1000), (time_ms % 1000));
 
-    uint32_t bit_count    = (test_byte_counter * 8);
-    float throughput_kbps = bit_count / (float)time_ms;
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %u.%.2u Kbps.\n", (uint8_t)throughput_kbps/1000, ((uint8_t)throughput_kbps)%1000);
+    uint32_t bit_count    = test_byte_counter * 8000;
+    uint32_t throughput_kbps = bit_count / time_ms;
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %u.%.2u Kbps.\n", (throughput_kbps / 1000), (throughput_kbps % 1000));
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Received %u bytes of payload.\n", test_byte_counter);
 
     if(0 != rssi_sum) 
@@ -315,18 +316,24 @@ static void send_set_message()
 
 static void button_event_handler(uint32_t button_number)
 {
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Button %u pressed\n", button_number);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_DBG1, "Button %u pressed\n", button_number);
 
 
-    /* Button 1: Run, Button 2: Stop, Client[0]
+    /* Button 1: Run acknowledged, Button 2: Run unaccknowledged, Button 3 & 4: Stop, Client[0]
      */
     switch (button_number)
     {
         case 0:
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in acknowledged mode\n");
+            test_mode = ACK;
             start_test();
             break;
         case 1:
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in unacknowledged mode\n");
+            test_mode = UNACK;
+            start_test();
+            break;
+        default:
             stop_test();
             break;
     }
