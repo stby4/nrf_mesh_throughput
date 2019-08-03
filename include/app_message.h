@@ -102,6 +102,8 @@ typedef struct
 {
     /** Value of the message */
     uint8_t * message;
+    /** Length of message */
+    uint16_t msg_len;
     /** Remaining time to reach `message`. */
     uint32_t remaining_time_ms;
     /** Time to delay the processing of received SET message. */
@@ -136,7 +138,7 @@ typedef void (*app_message_set_cb_t)(const app_message_server_t * p_server, uint
  * @param[out] p_message   User application fills this value with the value retrived from
  *                               the hardware interface.
  */
-typedef void (*app_message_get_cb_t)(const app_message_server_t * p_server, uint8_t ** p_message);
+typedef void (*app_message_get_cb_t)(const app_message_server_t * p_server, uint8_t ** p_message, uint16_t * msg_len);
 
 /** Application level structure holding the message server model context and message state representation */
 struct __app_message_server_t
@@ -185,6 +187,12 @@ void app_message_status_publish(app_message_server_t * p_server);
  *
 */
 uint32_t app_message_init(app_message_server_t * p_server, uint8_t element_index);
+
+/** Sends a message to the client of the model.
+ * 
+ * @todo documentation of parameters
+ */
+uint32_t send_string_message(app_message_server_t * p_server, uint8_t * p_data, uint16_t data_len);
 
 /** @} end of APP_MESSAGE */
 #endif /* APP_MESSAGE_H__ */

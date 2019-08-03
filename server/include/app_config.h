@@ -53,7 +53,7 @@
 #define APP_CONFIG_MIC_SIZE            (NRF_MESH_TRANSMIC_SIZE_SMALL)
 
 /** Size of a test message */
-#define APP_CONFIG_MESSAGE_SIZE               (11)
+#define APP_CONFIG_MESSAGE_SIZE               (128)
 
 /** @} end of APP_SPECIFIC_DEFINES */
 

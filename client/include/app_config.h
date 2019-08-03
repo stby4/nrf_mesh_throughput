@@ -58,9 +58,6 @@
 /** Transition time value used by the OnOff client for sending OnOff Set messages. */
 #define APP_CONFIG_MESSAGE_TRANSITION_TIME_MS (100)
 
-/** Size of a test message */
-#define APP_CONFIG_MESSAGE_SIZE               (11)
-
 /** Bytes to be transferred for throughput test */
 #define APP_CONFIG_BYTE_TRANSFER_CNT          (1024)
 

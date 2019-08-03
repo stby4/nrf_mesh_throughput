@@ -94,7 +94,7 @@ static bool                   m_device_provisioned;
 static void app_gen_message_client_publish_interval_cb(access_model_handle_t handle, void * p_self);
 static void app_generic_message_client_status_cb(const generic_message_client_t * p_self,
                                                const access_message_rx_meta_t * p_meta,
-                                               const generic_message_status_params_t * p_in);
+                                               const generic_message_get_params_t * p_in);
 static void app_gen_message_client_transaction_status_cb(access_model_handle_t model_handle,
                                                        void * p_args,
                                                        access_reliable_status_t status);
@@ -185,16 +185,16 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
 /* Generic message client model interface: Process the received status message in this callback */
 static void app_generic_message_client_status_cb(const generic_message_client_t * p_self,
                                                const access_message_rx_meta_t * p_meta,
-                                               const generic_message_status_params_t * p_in)
-{
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Bytes received: %d\n", test_byte_counter);
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %s\n", p_meta->src.value, &p_in->message);
-    
-    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
-    
+                                               const generic_message_get_params_t * p_in)
+{    
     ++rssi_count;
     rssi_sum += p_meta->p_core_metadata->params.scanner.rssi;
-    test_byte_counter += APP_CONFIG_MESSAGE_SIZE;
+    test_byte_counter += p_in->msg_len;
+    
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Bytes received: %d\n", test_byte_counter);
+    // __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message server: 0x%04x: %s\n", p_meta->src.value, &p_in->message);
+    
+    // __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
 
     run_test();
 }
@@ -250,7 +250,7 @@ static void stop_test()
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Time: %u.%.2u seconds elapsed.\n", (time_ms / 1000), (time_ms % 1000));
 
     uint32_t bit_count    = (test_byte_counter * 8);
-    float throughput_kbps = (bit_count / (time_ms / 1000.f));
+    float throughput_kbps = bit_count / (float)time_ms;
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %u.%.2u Kbps.\n", (uint8_t)throughput_kbps/1000, ((uint8_t)throughput_kbps)%1000);
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Received %u bytes of payload.\n", test_byte_counter);
 
@@ -268,7 +268,7 @@ static void send_get_message()
 {
     uint32_t status = NRF_SUCCESS;
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Requesting message\n");
+    // __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Requesting message\n");
 
     //(void)access_model_reliable_cancel(m_clients[0].model_handle);
     status = generic_message_client_get(&m_clients[0]);

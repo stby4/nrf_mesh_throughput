@@ -41,7 +41,9 @@
 
 #include "sdk_config.h"
 #include "example_common.h"
+
 #include "generic_message_server.h"
+#include "generic_message_messages.h"
 
 #include "log.h"
 #include "app_timer.h"
@@ -53,12 +55,12 @@
 /* Forward declaration */
 static void generic_message_state_get_cb(const generic_message_server_t * p_self,
                                        const access_message_rx_meta_t * p_meta,
-                                       generic_message_status_params_t * p_out);
+                                       generic_message_get_params_t * p_out);
 static void generic_message_state_set_cb(const generic_message_server_t * p_self,
                                        const access_message_rx_meta_t * p_meta,
                                        const generic_message_set_params_t * p_in,
                                        const model_transition_t * p_in_transition,
-                                       generic_message_status_params_t * p_out);
+                                       generic_message_get_params_t * p_out);
 
 const generic_message_server_callbacks_t message_srv_cbs =
 {
@@ -110,10 +112,10 @@ static void message_state_value_update(app_message_server_t * p_server)
     /* Requirement: If delay and transition time is zero, current state changes to the target state. */
     if ((p_server->state.delay_ms == 0 && p_server->state.remaining_time_ms == 0) || (p_server->state.delay_ms == 0))
     {
-        generic_message_status_params_t status_params;
+        generic_message_get_params_t status_params;
         status_params.message = p_server->state.message;
         status_params.remaining_time_ms = p_server->state.remaining_time_ms;
-        uint32_t success = generic_message_server_status_publish(&p_server->server, &status_params);
+        uint32_t success = generic_message_server_publish(&p_server->server, &status_params);
 
         if (!p_server->value_updated)
         {
@@ -158,7 +160,7 @@ static void message_state_timer_cb(void * p_context)
 
 static void generic_message_state_get_cb(const generic_message_server_t * p_self,
                                        const access_message_rx_meta_t * p_meta,
-                                       generic_message_status_params_t * p_out)
+                                       generic_message_get_params_t * p_out)
 {
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "msg: GET \n");
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "rssi: %d\n", p_meta->p_core_metadata->params.scanner.rssi);
@@ -166,10 +168,11 @@ static void generic_message_state_get_cb(const generic_message_server_t * p_self
     app_message_server_t   * p_server = PARENT_BY_FIELD_GET(app_message_server_t, server, p_self);
 
     /* Requirement: Provide the current message */
-    p_server->message_get_cb(p_server, &p_server->state.message);
+    p_server->message_get_cb(p_server, &p_server->state.message, &p_server->state.msg_len);
     p_out->message = p_server->state.message;
+    p_out->msg_len = p_server->state.msg_len;
 
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message: %s\n", &p_server->state.message);
+    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Message: %d\n", p_server->state.message);
 
     /* Requirement: Always report remaining time */
     if (p_server->state.remaining_time_ms > 0 && p_server->state.delay_ms == 0)
@@ -194,9 +197,9 @@ static void generic_message_state_set_cb(const generic_message_server_t * p_self
                                        const access_message_rx_meta_t * p_meta,
                                        const generic_message_set_params_t * p_in,
                                        const model_transition_t * p_in_transition,
-                                       generic_message_status_params_t * p_out)
+                                       generic_message_get_params_t * p_out)
 {
-    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "msg: SET: %d\n", p_in->message);
+    //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "msg: SET: %s\n", p_in->message);
 
     app_message_server_t   * p_server = PARENT_BY_FIELD_GET(app_message_server_t, server, p_self);
 
@@ -228,20 +231,22 @@ static void generic_message_state_set_cb(const generic_message_server_t * p_self
 
 /***** Interface functions *****/
 
-uint32_t app_message_publish(app_message_server_t * p_server, uint8_t * message)
+uint32_t app_message_publish(app_message_server_t * p_server, uint8_t * message, uint16_t msg_len)
 {
     p_server->state.message = message;
     p_server->state.delay_ms = 0;
     p_server->state.remaining_time_ms = 0;
     (void) app_timer_stop(*p_server->p_timer_id);
 
-    generic_message_status_params_t status = {
+    generic_message_get_params_t status = {
                 .message = message,
+                .msg_len = msg_len,
                 .remaining_time_ms = p_server->state.remaining_time_ms
             };
-    return generic_message_server_status_publish(&p_server->server, &status);
-    
+    return generic_message_server_publish(&p_server->server, &status);
 }
+
+
 
 uint32_t app_message_init(app_message_server_t * p_server, uint8_t element_index)
 {
@@ -266,4 +271,63 @@ uint32_t app_message_init(app_message_server_t * p_server, uint8_t element_index
     }
 
     return status;
+}
+
+
+uint32_t send_string_message(app_message_server_t * p_server, uint8_t * p_data, uint16_t data_len)
+{
+    uint32_t status = NRF_SUCCESS;
+    
+    access_message_tx_t tx_message;
+    memset(&tx_message, 0, sizeof(tx_message));
+
+    tx_message.opcode.opcode = GENERIC_MESSAGE_OPCODE_SET;
+    tx_message.opcode.company_id = GENERIC_MESSAGE_COMPANY_ID;
+    tx_message.p_buffer = p_data;
+    tx_message.length = data_len;
+    tx_message.force_segmented = p_server->server.settings.force_segmented;
+    tx_message.transmic_size = p_server->server.settings.transmic_size;
+    tx_message.access_token = nrf_mesh_unique_token_get();
+
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Model handle: %d\n", p_server->server.model_handle);
+
+
+    return access_model_publish(p_server->server.model_handle, &tx_message);
+    //return access_model_reliable_publish(p_server->server.model_handle, &tx_message);
+
+
+/*
+    nrf_mesh_tx_params_t tx_params;
+    memset(&tx_params, 0, sizeof(tx_params));
+
+    nrf_mesh_address_t dst;
+    memset(&dst, 0, sizeof(dst));
+
+
+    serial_evt_cmd_rsp_data_packet_send_t rsp;
+    rsp.token = nrf_mesh_unique_token_get();
+
+    status = dsm_tx_secmat_get(subnet_handle, appkey_handle, &tx_params.security_material);
+    if (status != NRF_SUCCESS)
+    {
+        return status;
+    }
+
+
+    tx_params.dst = dst_address;
+    tx_params.src = src_address;
+    tx_params.ttl = ttl;
+    tx_params.force_segmented = p_server->server.settings.force_segmented;
+    tx_params.transmic_size = p_server->server.settings.transmic_size;;
+    tx_params.p_data = p_data;
+    tx_params.data_len = data_len;
+    tx_params.tx_token = p_tx_message->access_token;
+    
+    
+    status = nrf_mesh_packet_send(&tx_params, NULL);
+    if (status == NRF_SUCCESS)
+    {
+        __LOG_XB(LOG_SRC_ACCESS, LOG_LEVEL_DBG1, "TX: Msg", p_tx_message->p_buffer, p_tx_message->length);
+    }
+*/
 }
