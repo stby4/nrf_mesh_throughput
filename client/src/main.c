@@ -74,15 +74,10 @@
 #define APP_STATE_ON                 (1)
 
 #define APP_UNACK_MSG_REPEAT_COUNT   (2)
+#define APP_GET_REQ_SIZE            (11)   // size of the get request
 
-enum TEST_MODE {
-    ACK,
-    UNACK
-};
-
-
-static volatile uint8_t test_mode = ACK;
 static volatile uint16_t test_byte_counter = 0;
+static volatile uint16_t missed_transfer_counter = 0;
 static volatile int32_t rssi_sum = 0;
 static volatile uint16_t rssi_count = 0;
 static volatile bool run = false;
@@ -165,20 +160,26 @@ static void app_gen_message_client_transaction_status_cb(access_model_handle_t m
     switch(status)
     {
         case ACCESS_RELIABLE_TRANSFER_SUCCESS:
-            //__LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer success.\n");
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer success.\n");
             break;
 
         case ACCESS_RELIABLE_TRANSFER_TIMEOUT:
             hal_led_blink_ms(LEDS_MASK, LED_BLINK_SHORT_INTERVAL_MS, LED_BLINK_CNT_NO_REPLY);
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer timeout.\n");
+            ++missed_transfer_counter;
+            run_test();
             break;
 
         case ACCESS_RELIABLE_TRANSFER_CANCELLED:
             __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Acknowledged transfer cancelled.\n");
+            ++missed_transfer_counter;
+            run_test();
             break;
 
         default:
             ERROR_CHECK(NRF_ERROR_INTERNAL);
+            ++missed_transfer_counter;
+            run_test();
             break;
     }
 }
@@ -227,8 +228,9 @@ static void run_test()
 
 static void start_test()
 {
-    if(!run) {  
+    if(!run) {
       test_byte_counter = 0;
+      missed_transfer_counter = 0;
       rssi_count = 0;
       rssi_sum = 0;
       ERROR_CHECK(app_timer_start(test_timer, APP_TIMER_TICKS(1000 * 60 * 60), timeout_handler));
@@ -250,10 +252,11 @@ static void stop_test()
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "=============================\n");
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Time: %u.%.2u seconds elapsed.\n", (time_ms / 1000), (time_ms % 1000));
 
-    uint32_t bit_count    = test_byte_counter * 8000;
+    uint32_t bit_count    = (test_byte_counter) * 8000;
     uint32_t throughput_kbps = bit_count / time_ms;
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Throughput: %u.%.2u Kbps.\n", (throughput_kbps / 1000), (throughput_kbps % 1000));
     __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Received %u bytes of payload.\n", test_byte_counter);
+    __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Missed %u acknowledged transfers.\n", missed_transfer_counter);
 
     if(0 != rssi_sum) 
     {
@@ -273,6 +276,7 @@ static void send_get_message()
 
     //(void)access_model_reliable_cancel(m_clients[0].model_handle);
     status = generic_message_client_get(&m_clients[0]);
+    test_byte_counter += APP_GET_REQ_SIZE;
 
     switch (status)
     {
@@ -319,18 +323,12 @@ static void button_event_handler(uint32_t button_number)
     __LOG(LOG_SRC_APP, LOG_LEVEL_DBG1, "Button %u pressed\n", button_number);
 
 
-    /* Button 1: Run acknowledged, Button 2: Run unaccknowledged, Button 3 & 4: Stop, Client[0]
+    /* Button 1: Run test, Button 2, 3, 4: Stop, Client[0]
      */
     switch (button_number)
     {
         case 0:
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in acknowledged mode\n");
-            test_mode = ACK;
-            start_test();
-            break;
-        case 1:
-            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test in unacknowledged mode\n");
-            test_mode = UNACK;
+            __LOG(LOG_SRC_APP, LOG_LEVEL_INFO, "Starting test.\n");
             start_test();
             break;
         default:

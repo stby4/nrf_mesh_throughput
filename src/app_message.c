@@ -281,7 +281,7 @@ uint32_t send_string_message(app_message_server_t * p_server, uint8_t * p_data, 
     access_message_tx_t tx_message;
     memset(&tx_message, 0, sizeof(tx_message));
 
-    tx_message.opcode.opcode = GENERIC_MESSAGE_OPCODE_SET;
+    tx_message.opcode.opcode = GENERIC_MESSAGE_OPCODE_STATUS;
     tx_message.opcode.company_id = GENERIC_MESSAGE_COMPANY_ID;
     tx_message.p_buffer = p_data;
     tx_message.length = data_len;
