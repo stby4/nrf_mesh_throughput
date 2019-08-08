@@ -76,7 +76,7 @@
 #define APP_MESSAGE_ELEMENT_INDEX     (0)
 
 static bool m_device_provisioned;
-static uint8_t * message[APP_CONFIG_MESSAGE_SIZE];
+static uint8_t message[APP_CONFIG_MESSAGE_SIZE];
 static uint16_t message_length = APP_CONFIG_MESSAGE_SIZE;
 
 /*************************************************************************************************/

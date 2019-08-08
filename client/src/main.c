@@ -276,7 +276,7 @@ static void send_get_message()
 
     //(void)access_model_reliable_cancel(m_clients[0].model_handle);
     status = generic_message_client_get(&m_clients[0]);
-    test_byte_counter += APP_GET_REQ_SIZE;
+    //test_byte_counter += APP_GET_REQ_SIZE;
 
     switch (status)
     {
