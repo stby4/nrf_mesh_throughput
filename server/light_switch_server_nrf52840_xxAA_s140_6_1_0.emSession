@@ -70,7 +70,7 @@
  <Files>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="10105" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="0" top="10091" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="175" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../models/model_spec/generic_message/src/generic_message_server.c" selected="0" top="155" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="110" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="1" top="88" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="36" y="81" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="1" top="75" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="276" useTextEdit="1" useBinaryEdit="0" left="0" path="../src/app_message.c" selected="0" top="274" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="406" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../mesh/gatt/src/proxy.c" selected="0" top="380" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="268" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../mesh/access/src/access.c" selected="0" top="246" codecName="Default"/>

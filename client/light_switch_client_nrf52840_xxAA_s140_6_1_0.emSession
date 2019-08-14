@@ -66,7 +66,7 @@
  </Watch4>
  <Files>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../doc/getting_started/SES.md" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="269" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="1" top="260" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="266" useTextEdit="1" useBinaryEdit="0" left="0" path="src/main.c" selected="1" top="260" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="42" useTextEdit="1" useBinaryEdit="0" left="0" path="C:/nRF5_SDK_14.2.0_17b948a/components/boards/boards.h" selected="0" top="14" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="75" useTextEdit="1" useBinaryEdit="0" left="0" path="../../common/src/mesh_provisionee.c" selected="0" top="285" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="162" useTextEdit="1" useBinaryEdit="0" left="0" path="include/sdk_config.h" selected="0" top="128" codecName="Default"/>
