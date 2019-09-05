@@ -24,9 +24,6 @@ Additionally, you need the following:
 - _nRF Mesh_ app for [Android](https://play.google.com/store/apps/details?id=no.nordicsemi.android.nrfmeshprovisioner) or [iOS](https://apps.apple.com/us/app/nrf-mesh/id1380726771) if you decide to provision using the application.
 
 
----
-
-
 ## Testing
 
 To test the throughput, build the examples with Segger Embedded Studio.
